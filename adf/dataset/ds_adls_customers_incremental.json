@@ -11,6 +11,9 @@
             },
             "file_name": {
                 "type": "string"
+            },
+            "file_system": {
+                "type": "string"
             }
         },
         "annotations": [],
@@ -26,7 +29,7 @@
                     "value": "@dataset().folder_name",
                     "type": "Expression"
                 },
-                "fileSystem": "raw"
+                "fileSystem": "@dataset().file_system"
             },
             "compressionCodec": "snappy"
         },

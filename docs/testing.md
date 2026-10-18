@@ -219,3 +219,39 @@ screenshots/
 ```
 
 See [`troubleshooting.md`](troubleshooting.md) for incident triage and recovery procedures.
+
+
+## Reliability Testing
+
+Eight test scenarios were designed to validate
+the Azure Cloud ETL Pipeline.
+
+### Test Coverage
+
+- Full Load
+- Incremental Load
+- No New Data
+- SQL Connection Failure
+- ADLS Write Failure
+- Retry Policy
+- Rerun and Idempotency
+- Dynamic File Path
+
+### Key Findings
+
+The pipeline uses a SQL Server watermark control
+table to track incremental loading progress.
+
+The watermark is updated only after the Copy
+Activity succeeds.
+
+Failure scenarios are monitored through ADF
+Pipeline Runs and Activity Runs.
+
+### Known Limitations
+
+- Copy and watermark updates are not atomic.
+- Reruns may produce duplicate Parquet files.
+- Updated_at watermarks may miss late commits.
+- Physical deletes are not captured automatically.
+- Exactly-once semantics require additional design.

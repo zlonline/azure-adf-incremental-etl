@@ -66,7 +66,7 @@
                 }
             },
             {
-                "name": "Copy Incremental Customers",
+                "name": "Copy Incremental Data",
                 "type": "Copy",
                 "dependsOn": [
                     {
@@ -125,11 +125,15 @@
                         "type": "DatasetReference",
                         "parameters": {
                             "folder_name": {
-                                "value": "@concat(\n    pipeline().parameters.table_name,\n    '/year=',\n    formatDateTime(utcNow(),'yyyy'),\n    '/month=',\n    formatDateTime(utcNow(),'MM'),\n    '/day=',\n    formatDateTime(utcNow(),'dd')\n)",
+                                "value": "@concat(\n    pipeline().parameters.table_name,\n    '/year=',\n    formatDateTime(\n        if(\n            empty(pipeline().parameters.load_date),\n            utcNow(),\n            pipeline().parameters.load_date\n        ),\n        'yyyy'\n    ),\n    '/month=',\n    formatDateTime(\n        if(\n            empty(pipeline().parameters.load_date),\n            utcNow(),\n            pipeline().parameters.load_date\n        ),\n        'MM'\n    ),\n    '/day=',\n    formatDateTime(\n        if(\n            empty(pipeline().parameters.load_date),\n            utcNow(),\n            pipeline().parameters.load_date\n        ),\n        'dd'\n    )\n)",
                                 "type": "Expression"
                             },
                             "file_name": {
                                 "value": "@concat(\n    pipeline().parameters.table_name,\n    '_',\n    pipeline().RunId,\n    '.parquet'\n)",
+                                "type": "Expression"
+                            },
+                            "file_system": {
+                                "value": "@pipeline().parameters.output_layer",
                                 "type": "Expression"
                             }
                         }
@@ -141,7 +145,7 @@
                 "type": "SqlServerStoredProcedure",
                 "dependsOn": [
                     {
-                        "activity": "Copy Incremental Customers",
+                        "activity": "Copy Incremental Data",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -184,7 +188,7 @@
                 "type": "Fail",
                 "dependsOn": [
                     {
-                        "activity": "Copy Incremental Customers",
+                        "activity": "Copy Incremental Data",
                         "dependencyConditions": [
                             "Failed"
                         ]
@@ -216,6 +220,13 @@
             "watermark_key": {
                 "type": "string",
                 "defaultValue": "customer_pipeline"
+            },
+            "output_layer": {
+                "type": "string",
+                "defaultValue": "bronze"
+            },
+            "load_date": {
+                "type": "string"
             }
         },
         "annotations": [],
